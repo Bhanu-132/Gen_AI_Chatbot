@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Chatbot</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; /* Modern font */
+            background-color: #1a237e; /* Deep Indigo */
+            color: #e0f7fa; /* Light Cyan */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #283593; /* Indigo */
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            padding: 40px;
+            width: 90%;
+            max-width: 700px;
+            text-align: left;
+        }
+        h2 {
+            color: #ffab91; /* Deep Orange Accent */
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b3e5fc; /* Light Blue Accent */
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #5c6bc0; /* Light Indigo */
+            border-radius: 8px;
+            background-color: #3f51b5; /* Indigo 500 */
+            color: #e0f7fa;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            border-color: #ffab91; /* Deep Orange Accent on focus */
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        button {
+            background-color: #ff7043; /* Deep Orange */
+            color: #fff;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #f4511e; /* Darker Deep Orange */
+        }
+        #responseContainer {
+            margin-top: 40px;
+            background-color: #303f9f; /* Indigo 700 */
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            position: relative; /* For copy button positioning */
+        }
+        .response-header {
+            color: #b3e5fc;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .email-content {
+            white-space: pre-line;
+            line-height: 1.4; /* Reduced line height */
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #5c6bc0; /* Light Indigo */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .copy-button:hover {
+            background-color: #3f51b5; /* Indigo 500 */
+        }
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #ffab91;
+            color: #1a237e;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .scroll-top:hover {
+            background-color: #f48fb1; /* Pink Accent */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+                width: 95%;
+            }
+            input[type="text"],
+            input[type="email"],
+            textarea,
+            button {
+                font-size: 14px;
+            }
+            .scroll-top {
+                font-size: 12px;
+            }
+            .button-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2>Generate Professional Email</h2>
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" placeholder="Enter your name">
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" placeholder="Enter your email">
+
+        <label for="taxid">Your Tax ID:</label>
+        <input type="text" id="taxid" placeholder="Enter your Tax ID">
+
+        <label for="subject">Email Subject:</label>
+        <textarea id="subject" placeholder="Enter email subject"></textarea>
+
+        <div class="button-container">
+            <button onclick="generateEmail()">Generate Email</button>
+            <button onclick="clearForm()">Clear Form</button>
+        </div>
+
+        <div id="responseContainer" style="display: none;">
+            <h3 class="response-header">Generated Email:</h3>
+            <pre id="generatedEmail" class="email-content"></pre>
+            <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <button class="scroll-top" onclick="scrollToTop()">↑ Top</button>
+
+    <script>
+        function generateEmail() {
+            let name = document.getElementById('name').value;
+            let email = document.getElementById('email').value;
+            let taxid = document.getElementById('taxid').value;
+            let subject = document.getElementById('subject').value;
+            let responseContainer = document.getElementById('responseContainer');
+            let generatedEmailElement = document.getElementById('generatedEmail');
+
+            if (!name || !email || !taxid || !subject) {
+                alert('All fields are required!');
+                return;
+            }
+
+            // Add a loading message
+            responseContainer.style.display = 'block';
+            generatedEmailElement.textContent = 'Generating email...';
+
+            fetch('/generate-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, taxid, subject })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove HTML tags and preserve line breaks
+                let emailText = data.response.replace(/<[^>]*>/g, '').replace(/<br\s*\/?>/gi, '\n');
+
+                // Add extra newlines for better spacing
+                emailText = emailText.replace(/Subject:(.*?)Dear/, 'Subject:$1\n\nDear'); // Separate Subject and Greeting
+                emailText = emailText.replace(/Dear HR Team,(.*?)\./, 'Dear HR Team,\n\n$1.'); // Newline after greeting
+
+                emailText = emailText.replace(/(.*[^\n])Sincerely/, '$1\n\n\nSincerely'); // More space before Sincerely
+                emailText = emailText.replace(/Sincerely,(.*)/, 'Sincerely,\n$1'); // Newline after Sincerely
+
+                generatedEmailElement.textContent = emailText;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                generatedEmailElement.textContent = 'Error generating email. Please try again.';
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('taxid').value = '';
+            document.getElementById('subject').value = '';
+            document.getElementById('responseContainer').style.display = 'none';
+        }
+
+        function copyToClipboard() {
+            const emailText = document.getElementById('generatedEmail').textContent;
+            navigator.clipboard.writeText(emailText)
+                .then(() => {
+                    alert('Email copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert('Could not copy email to clipboard.');
+                });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onscroll = function() {
+            document.querySelector('.scroll-top').style.display = window.scrollY > 100 ? 'block' : 'none';
+        };
+    </script>
+</body>
+</html>
